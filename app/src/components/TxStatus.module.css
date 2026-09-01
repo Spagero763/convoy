@@ -1,0 +1,166 @@
+.wrap {
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.wrapFailed {
+  border-color: rgba(229, 105, 95, 0.35);
+}
+
+.wrapDone {
+  border-color: rgba(78, 201, 160, 0.35);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.indicator {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  flex: none;
+}
+
+.indicatorCore {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: var(--signal);
+}
+
+.indicatorRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--signal);
+  opacity: 0;
+}
+
+.indicatorDone .indicatorCore {
+  background: var(--positive);
+}
+
+.indicatorFailed .indicatorCore {
+  background: var(--negative);
+}
+
+/* ---------- step rail ---------- */
+
+.steps {
+  display: flex;
+  gap: 3px;
+  padding: 0 14px 12px;
+}
+
+.step {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  border-radius: 1px;
+}
+
+.stepFill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: var(--signal);
+}
+
+.stepFillDone {
+  background: var(--positive);
+}
+
+.stepFillFailed {
+  background: var(--negative);
+}
+
+.body {
+  padding: 0 14px 13px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--signal);
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.details {
+  margin-top: 10px;
+}
+
+.details summary {
+  cursor: pointer;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  list-style: none;
+}
+
+.details summary::-webkit-details-marker {
+  display: none;
+}
+
+.details summary::before {
+  content: "▸ ";
+}
+
+.details[open] summary::before {
+  content: "▾ ";
+}
+
+.raw {
+  display: block;
+  margin: 8px 0 0;
+  padding: 9px 10px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.4);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 160px;
+  overflow: auto;
+}
+
+.dismiss {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.dismiss:hover {
+  color: var(--ink);
+}

@@ -1,0 +1,115 @@
+.head {
+  padding: 40px 0 26px;
+  border-bottom: 1px solid var(--line);
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.sub {
+  max-width: 620px;
+  margin: 10px 0 0;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--ink-muted);
+}
+
+.table {
+  padding: 8px 0 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 28px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+
+.rowHead {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  align-items: flex-start;
+}
+
+.fact {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.detail {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink-muted);
+}
+
+.notes {
+  padding: 36px 0 0;
+}
+
+.notesTitle {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.note {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.noteTitle {
+  margin: 0 0 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.noteBody {
+  max-width: 720px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink-muted);
+}
+
+.contracts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 30px 0 64px;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.link {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--signal);
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}

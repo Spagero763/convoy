@@ -1,0 +1,128 @@
+.head {
+  padding: 40px 0 24px;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
+.sub {
+  max-width: 560px;
+  margin: 10px 0 0;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--ink-muted);
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.cardId {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+
+.cardLots {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+
+.cardBody {
+  padding: 4px 16px;
+}
+
+.cardFoot {
+  padding: 14px 16px;
+}
+
+.empty {
+  padding: 40px 22px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 13.5px;
+}
+
+.emptyNote {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+}
+
+.recover {
+  margin: 34px 0 60px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.recoverNote {
+  max-width: 620px;
+  margin: 9px 0 16px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--ink-muted);
+}
+
+.recoverRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.input {
+  height: 36px;
+  padding: 0 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink);
+  width: 130px;
+  transition: border-color 120ms ease;
+}
+
+.input::placeholder {
+  color: var(--ink-faint);
+}
+
+.input:focus {
+  border-color: var(--signal);
+  outline: none;
+}
+
+.inputWide {
+  flex: 1;
+  min-width: 220px;
+  width: auto;
+}

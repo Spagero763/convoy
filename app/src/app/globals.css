@@ -1,0 +1,438 @@
+/*
+ * Convoy design tokens.
+ *
+ * The product is an instrument. Everything here follows from that: a near-black
+ * ground so numbers carry the contrast, one signal colour rather than a palette,
+ * hairline rules instead of boxes, and a single monospace for every figure so
+ * digits align down a column. Nothing glows.
+ */
+
+:root {
+  color-scheme: dark;
+
+  --ground: #08090a;
+  --surface: #0d0f11;
+  --surface-raised: #131619;
+  --surface-sunken: #050607;
+
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+
+  --ink: #e8eaed;
+  --ink-muted: #8b9198;
+  --ink-faint: #5a6067;
+
+  --signal: #5b9dff;
+  --signal-dim: rgba(91, 157, 255, 0.14);
+  --positive: #4ec9a0;
+  --caution: #e0a458;
+  --negative: #e5695f;
+
+  --radius: 3px;
+  --radius-lg: 5px;
+
+  --step: 4px;
+
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Mono", Menlo,
+    Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  --shell-max: 1180px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* A faint fixed grid. Static, never animated, purely to seat the content. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.014) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.014) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+input {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: rgba(91, 157, 255, 0.28);
+}
+
+:focus-visible {
+  outline: 1px solid var(--signal);
+  outline-offset: 2px;
+}
+
+/* ---------- typography primitives ---------- */
+
+.mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+  letter-spacing: -0.01em;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.numeral {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- layout ---------- */
+
+.shell {
+  position: relative;
+  z-index: 1;
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.spread {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rule {
+  height: 1px;
+  background: var(--line);
+  border: 0;
+  margin: 0;
+}
+
+/* ---------- panels ---------- */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-body {
+  padding: 18px;
+}
+
+/* ---------- data rows ---------- */
+
+.field {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.field:last-child {
+  border-bottom: 0;
+}
+
+.field-key {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.field-value {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--ink);
+  text-align: right;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-strong);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-size: 13px;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: #171a1e;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+}
+
+.btn-primary {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: #04070d;
+  font-weight: 500;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #7cb0ff;
+  border-color: #7cb0ff;
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--line);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-lg {
+  height: 44px;
+  font-size: 14px;
+}
+
+/* ---------- status chips ---------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 2px;
+  border: 1px solid var(--line);
+  background: var(--surface-sunken);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.chip-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+.chip-live {
+  color: var(--signal);
+  border-color: rgba(91, 157, 255, 0.3);
+}
+
+.chip-good {
+  color: var(--positive);
+  border-color: rgba(78, 201, 160, 0.3);
+}
+
+.chip-warn {
+  color: var(--caution);
+  border-color: rgba(224, 164, 88, 0.3);
+}
+
+.chip-bad {
+  color: var(--negative);
+  border-color: rgba(229, 105, 95, 0.3);
+}
+
+/* A slow, low-amplitude pulse. Only ever on a live indicator. */
+@keyframes convoy-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.pulse {
+  animation: convoy-pulse 2.4s ease-in-out infinite;
+}
+
+/* ---------- skeletons ---------- */
+
+@keyframes convoy-shimmer {
+  0% {
+    background-position: -180px 0;
+  }
+  100% {
+    background-position: 180px 0;
+  }
+}
+
+.skeleton {
+  display: inline-block;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 360px 100%;
+  animation: convoy-shimmer 1.3s linear infinite;
+  color: transparent;
+  user-select: none;
+}
+
+/* ---------- notices ---------- */
+
+.notice {
+  border: 1px solid var(--line);
+  border-left-width: 2px;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  background: var(--surface-sunken);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.notice-info {
+  border-left-color: var(--signal);
+}
+
+.notice-warn {
+  border-left-color: var(--caution);
+}
+
+.notice-bad {
+  border-left-color: var(--negative);
+}
+
+.notice-good {
+  border-left-color: var(--positive);
+}
+
+.notice-title {
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+
+.notice-body {
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+/* ---------- misc ---------- */
+
+.muted {
+  color: var(--ink-muted);
+}
+
+.faint {
+  color: var(--ink-faint);
+}
+
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .skeleton {
+    animation: none;
+    background: rgba(255, 255, 255, 0.05);
+  }
+}

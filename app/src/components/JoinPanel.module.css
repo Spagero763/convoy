@@ -1,0 +1,143 @@
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.head {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.body {
+  padding: 18px;
+}
+
+.section {
+  margin-bottom: 18px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- lot selector ---------- */
+
+.lots {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.lot {
+  position: relative;
+  flex: 1;
+  height: 46px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  color: var(--ink-muted);
+  transition:
+    border-color 120ms ease,
+    color 120ms ease,
+    background-color 120ms ease;
+}
+
+.lot:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--ink);
+}
+
+.lotActive {
+  border-color: var(--signal);
+  background: var(--signal-dim);
+  color: var(--ink);
+}
+
+.lotCrowd {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: var(--signal);
+}
+
+.hint {
+  margin: 9px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-faint);
+}
+
+/* ---------- cost breakdown ---------- */
+
+.costs {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+  padding: 4px 13px;
+}
+
+.costRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.costRow:last-child {
+  border-bottom: 0;
+}
+
+.costKey {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.costValue {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.costValueMuted {
+  color: var(--ink-faint);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footnote {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--ink-faint);
+}
+
+.keyBox {
+  margin-top: 10px;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+}
+
+.keyValue {
+  display: block;
+  margin: 6px 0 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--signal);
+  word-break: break-all;
+}
