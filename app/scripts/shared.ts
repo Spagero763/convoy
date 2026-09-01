@@ -57,7 +57,17 @@ export async function submit(
   const { transaction_hash } = await account.execute(calls);
   console.log(`  tx     ${transaction_hash}`);
   console.log(`  waiting for acceptance`);
-  await account.waitForTransaction(transaction_hash);
+
+  const receipt = await getProvider().waitForTransaction(transaction_hash);
+  const status = (receipt as { execution_status?: string }).execution_status;
+  if (status === "REVERTED") {
+    throw new Error(
+      `${label} reverted: ${
+        (receipt as { revert_reason?: string }).revert_reason ?? "no reason given"
+      }`,
+    );
+  }
+
   console.log(`  https://voyager.online/tx/${transaction_hash}`);
   return transaction_hash;
 }

@@ -113,7 +113,14 @@ export function LiveBatch({ batch, legs, now, mine }: Props) {
 
         {legs.length === 0 ? (
           <div className={styles.empty}>
-            No orders yet. The first leg into a batch waits for company.
+            {batch.orderCount > 0
+              ? // Counts come from contract storage and are always right. Leg
+                // detail comes from events, which an endpoint can fail to
+                // serve. Saying "no orders" here would be a lie.
+                `${batch.orderCount} ${
+                  batch.orderCount === 1 ? "order" : "orders"
+                } committed. Per-leg detail is not available from this endpoint right now.`
+              : "No orders yet. The first leg into a batch waits for company."}
           </div>
         ) : (
           <div className={styles.legs} ref={legsRef}>
@@ -142,6 +149,7 @@ export function LiveBatch({ batch, legs, now, mine }: Props) {
           legs={legs}
           distribution={distribution}
           minOrders={batch.minOrders}
+          orderCount={batch.orderCount}
           mineSet={mineSet}
         />
       </div>
@@ -218,16 +226,29 @@ function Verdict({
   legs,
   distribution,
   minOrders,
+  orderCount,
   mineSet,
 }: {
   legs: Leg[];
   distribution: Map<number, number>;
   minOrders: number;
+  orderCount: number;
   mineSet: Set<string>;
 }) {
   const myLeg = legs.find((leg) => mineSet.has(BigInt(leg.commitment).toString()));
 
   if (legs.length === 0) {
+    // Without leg detail there is no honest claim to make about cover, so the
+    // only correct thing is to say the assessment is unavailable.
+    if (orderCount > 0) {
+      return (
+        <div className={styles.verdict}>
+          {orderCount} {orderCount === 1 ? "order is" : "orders are"} committed,
+          but the size distribution could not be read. Cover cannot be assessed
+          without it.
+        </div>
+      );
+    }
     return (
       <div className={`${styles.verdict} ${styles.verdictWeak}`}>
         An empty batch hides nothing. Cover starts at the second leg.
