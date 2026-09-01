@@ -5,12 +5,18 @@ export const CHAIN_NAME = "Starknet Mainnet";
  * Read endpoints, tried in order. The client rotates on failure rather than
  * pinning one provider, so a single endpoint going down degrades latency
  * instead of taking the board offline.
+ *
+ * Checked against the live network rather than taken from documentation:
+ * Blast is decommissioned and returns an error to every request, and Nethermind's
+ * free endpoint answers nothing. Lava works but load-balances across backends
+ * reporting different JSON-RPC spec versions (0.8.1 and 0.10.2 on alternating
+ * calls), which is survivable for reads but not something to put first.
  */
 export const RPC_URLS = [
   process.env.NEXT_PUBLIC_RPC_URL,
+  "https://api.cartridge.gg/x/starknet/mainnet",
   "https://rpc.starknet.lava.build",
-  "https://starknet-mainnet.public.blastapi.io/rpc/v0_8",
-  "https://free-rpc.nethermind.io/mainnet-juno",
+  "https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/demo",
 ].filter(Boolean) as string[];
 
 /** Canonical STRK20 privacy pool. */

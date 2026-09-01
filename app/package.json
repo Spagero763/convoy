@@ -9,6 +9,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "probe:route": "tsx scripts/probe-route.ts",
+    "rehearse": "tsx scripts/fork-rehearsal.ts",
     "deploy:venue": "tsx scripts/deploy.ts",
     "batch:create": "tsx scripts/create-batch.ts",
     "batch:settle": "tsx scripts/settle.ts"

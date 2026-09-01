@@ -192,6 +192,38 @@ cp .env.example .env.local     # fill in NEXT_PUBLIC_VENUE_ADDRESS
 npm run dev
 ```
 
+### Rehearsing against forked mainnet
+
+Before spending anything, run the whole cycle against a fork of mainnet with the
+real Ekubo router, the real STRK/USDC pool and the real current price. The only
+substitution is the privacy pool itself, which cannot be driven without a prover.
+
+```bash
+starknet-devnet --fork-network https://api.cartridge.gg/x/starknet/mainnet \
+                --fork-block 14219540 --fork-upstream-caching true \
+                --port 5150 --seed 42 --state-archive-capacity full
+
+cd app && npm run rehearse
+```
+
+It deploys, schedules, fills three orders, crosses against real liquidity, and
+redeems each order, asserting throughout. A recorded run:
+
+```
+in   10.0000 STRK   (3 orders: 2 + 2 + 1 lots)
+out  0.267983 USDC  via one aggregate swap
+rate 0.026798 USDC per STRK
+
+ok  2-lot order redeems 0.107193 USDC   allowance exact
+ok  1-lot order redeems 0.053596 USDC   allowance exact
+ok  redemptions never exceed realised output  0.267982 of 0.267983
+ok  second redemption rejected
+ok  direct caller rejected
+```
+
+The one-unit gap is the rounding invariant: redemptions round down, so the
+remainder stays as dust rather than leaving the last order unpayable.
+
 ### Deploying
 
 ```bash
