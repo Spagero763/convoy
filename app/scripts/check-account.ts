@@ -12,7 +12,7 @@
  *
  * Usage: npx tsx scripts/check-account.ts
  */
-import { Account, RpcProvider, ec, num } from "starknet";
+import { Account, RpcProvider, ec, hash, num } from "starknet";
 import { STRK } from "../src/lib/config";
 import { artifacts, getAccount, getProvider, requireEnv } from "./shared";
 
@@ -57,10 +57,24 @@ async function main() {
   const balance = BigInt(balanceRaw[0]);
   console.log(`balance  ${fmt(balance)} STRK`);
 
-  // 3. Does the key control the account? Account contracts expose their owner
-  // public key under one of a few names depending on the wallet.
+  // 3. Does the key control the account?
+  //
+  // This is checked against the owner the account actually stores, and a
+  // mismatch is fatal. Estimating a fee is NOT a substitute: the estimate path
+  // skips owner validation, so a wrong key estimates happily and then fails
+  // with 'argent/invalid-owner-sig' at submission.
+  //
+  // Two encodings are accepted. Older accounts store a raw public key; newer
+  // Argent and Ready accounts store a GUID, poseidon('Starknet Signer', pubkey).
   const derived = num.toHex(ec.starkCurve.getStarkKey(privateKey));
+  const guid = hash.computePoseidonHashOnElements([
+    num.toHex(BigInt("0x" + Buffer.from("Starknet Signer", "ascii").toString("hex"))),
+    derived,
+  ]);
+
   let matched: string | null = null;
+  let sawOwner: { entrypoint: string; value: string } | null = null;
+
   for (const entrypoint of ["get_owner", "getPublicKey", "get_public_key", "getSigner"]) {
     try {
       const result = await provider.callContract({
@@ -68,23 +82,38 @@ async function main() {
         entrypoint,
         calldata: [],
       });
-      if (result?.[0] && BigInt(result[0]) === BigInt(derived)) {
-        matched = entrypoint;
+      if (!result?.[0]) continue;
+      const owner = BigInt(result[0]);
+      if (owner === BigInt(derived)) {
+        matched = `${entrypoint}, raw public key`;
         break;
       }
-      if (result?.[0]) {
-        console.log(
-          `\n  ${entrypoint} returned ${num.toHex(BigInt(result[0]))}`,
-        );
-        console.log(`  key derives  ${derived}`);
+      if (owner === BigInt(guid)) {
+        matched = `${entrypoint}, Starknet Signer GUID`;
+        break;
       }
+      sawOwner = { entrypoint, value: num.toHex(owner) };
     } catch {
       // Entrypoint not present on this account class. Try the next.
     }
   }
-  console.log(
-    `key      ${matched ? `controls this account (via ${matched})` : "could not be confirmed by a read"}`,
-  );
+
+  if (matched) {
+    console.log(`key      controls this account (${matched})`);
+  } else {
+    console.log("key      DOES NOT control this account\n");
+    if (sawOwner) {
+      console.log(`  ${sawOwner.entrypoint} reports owner  ${sawOwner.value}`);
+    }
+    console.log(`  this key's public key        ${derived}`);
+    console.log(`  this key's signer GUID       ${guid}`);
+    console.log(
+      "\n  The address and the private key are from different accounts. Export the key",
+    );
+    console.log("  from the account whose address is the one above, then run this again.");
+    console.log("\n  Nothing was spent.");
+    process.exit(1);
+  }
 
   // 4. The real cost of the expensive operation, from the live network.
   const { sierra, casm } = artifacts();
@@ -93,10 +122,6 @@ async function main() {
     const estimate = await account.estimateDeclareFee({ contract: sierra, casm });
     const fee = BigInt(estimate.overall_fee ?? 0n);
     console.log(`\ndeclare  ~${fmt(fee)} STRK  (the most expensive step)`);
-
-    // Signing succeeded, which proves the key far better than any read can.
-    console.log("key      confirmed by signing the estimate");
-
     const headroom = balance > fee ? balance - fee : 0n;
     console.log(`left     ~${fmt(headroom)} STRK after declaring`);
     if (headroom < fee) {

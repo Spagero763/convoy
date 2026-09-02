@@ -7,7 +7,13 @@ import { RPC_URLS } from "../src/lib/config";
 config({ path: resolve(process.cwd(), ".env.local") });
 config({ path: resolve(process.cwd(), ".env") });
 
-const ARTIFACT_DIR = resolve(process.cwd(), "../contracts/target/dev");
+/**
+ * Which build to declare. Release strips debug identifiers, which is the only
+ * lever that meaningfully changes what a declare costs, since the fee is priced
+ * on the Sierra the sequencer has to compile.
+ */
+const PROFILE = process.env.SCARB_PROFILE ?? "release";
+const ARTIFACT_DIR = resolve(process.cwd(), `../contracts/target/${PROFILE}`);
 
 export function artifacts() {
   return {

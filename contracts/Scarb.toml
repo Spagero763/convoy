@@ -27,5 +27,10 @@ sort-module-level-items = true
 [tool.scarb]
 allow-prebuilt-plugins = ["snforge_std"]
 
+# Declaring a class is priced almost entirely on the size of the Sierra the
+# sequencer has to compile, so the release profile strips debug identifiers and
+# leaves inlining alone. This is the artifact that gets declared.
 [profile.release.cairo]
-inlining-strategy = "default"
+sierra-replace-ids = false
+unstable-add-statements-functions-debug-info = false
+unstable-add-statements-code-locations-debug-info = false
