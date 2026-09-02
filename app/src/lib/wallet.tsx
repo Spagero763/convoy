@@ -58,6 +58,8 @@ type WalletContextValue = {
   disconnect: () => void;
   switchNetwork: () => Promise<void>;
   refreshBalances: () => Promise<void>;
+  /** Re-scan for injected wallets, for extensions that register late. */
+  rescan: () => void;
   signTypedData: (typedData: unknown) => Promise<string[]>;
   submitPrivate: (actions: Strk20Action[]) => Promise<string>;
   prepare: (actions: Strk20Action[]) => Promise<unknown>;
@@ -84,6 +86,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   // load after paint rather than blocking the board.
   useEffect(() => {
     let cancelled = false;
+    let unsubscribe: (() => void) | null = null;
+    const timers: ReturnType<typeof setTimeout>[] = [];
 
     (async () => {
       const { createStore } = await import("@starknet-io/get-starknet-discovery");
@@ -97,8 +101,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setAvailable(
           wallets.map((w) => ({ id: w.name, name: w.name, icon: w.icon })),
         );
+        // Extensions inject asynchronously, and some register well after first
+        // paint. Any pre-connection status has to stay open to revision or the
+        // UI latches on "no wallet found" and never recovers. Statuses that
+        // describe an actual connection are left alone.
         setStatus((current) =>
-          current === "loading"
+          current === "loading" ||
+          current === "no-wallets" ||
+          current === "disconnected"
             ? wallets.length === 0
               ? "no-wallets"
               : "disconnected"
@@ -107,12 +117,24 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       };
 
       publish();
-      const cleanup = store.subscribe(publish);
-      return cleanup;
+      unsubscribe = store.subscribe(publish);
+
+      // Belt and braces for wallets that register without notifying the store.
+      for (const delay of [300, 1_000, 2_500]) {
+        timers.push(
+          setTimeout(() => {
+            if (cancelled) return;
+            store._refreshInjectedWallets?.();
+            publish();
+          }, delay),
+        );
+      }
     })();
 
     return () => {
       cancelled = true;
+      unsubscribe?.();
+      for (const timer of timers) clearTimeout(timer);
     };
   }, []);
 
@@ -219,6 +241,21 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   }, [connect, walletName]);
 
+  const rescan = useCallback(() => {
+    const store = storeRef.current;
+    if (!store) return;
+    store._refreshInjectedWallets?.();
+    const wallets = store.getWallets();
+    setAvailable(wallets.map((w) => ({ id: w.name, name: w.name, icon: w.icon })));
+    setStatus((current) =>
+      current === "loading" || current === "no-wallets" || current === "disconnected"
+        ? wallets.length === 0
+          ? "no-wallets"
+          : "disconnected"
+        : current,
+    );
+  }, []);
+
   const disconnect = useCallback(() => {
     accountRef.current = null;
     setAddress(null);
@@ -263,6 +300,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       disconnect,
       switchNetwork,
       refreshBalances,
+      rescan,
       signTypedData,
       submitPrivate,
       prepare,
@@ -280,6 +318,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       disconnect,
       switchNetwork,
       refreshBalances,
+      rescan,
       signTypedData,
       submitPrivate,
       prepare,

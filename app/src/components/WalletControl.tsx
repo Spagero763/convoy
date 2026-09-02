@@ -17,6 +17,7 @@ export function WalletControl() {
     walletName,
     available,
     connect,
+    rescan,
     disconnect,
     switchNetwork,
   } = useWallet();
@@ -139,7 +140,18 @@ export function WalletControl() {
             <div className={styles.empty}>
               <strong style={{ color: "var(--ink)" }}>No Starknet wallet found.</strong>
               <p style={{ margin: "6px 0 0" }}>
-                Install{" "}
+                If the extension is installed, it may still be registering. Scan
+                again before reloading.
+              </p>
+              <button
+                className="btn btn-ghost btn-block"
+                style={{ marginTop: 10 }}
+                onClick={rescan}
+              >
+                Scan again
+              </button>
+              <p style={{ margin: "10px 0 0" }}>
+                Otherwise install{" "}
                 <a
                   className={styles.link}
                   href="https://www.ready.co/"
@@ -147,8 +159,8 @@ export function WalletControl() {
                   rel="noreferrer noopener"
                 >
                   Ready
-                </a>{" "}
-                and reload. It is the wallet with privacy live on mainnet.
+                </a>
+                , which has privacy live on mainnet, and reload.
               </p>
             </div>
           ) : (
