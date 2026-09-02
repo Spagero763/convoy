@@ -56,6 +56,27 @@ function check(label: string, condition: boolean, detail = "") {
   console.log(`${mark} ${label}${detail ? `  ${detail}` : ""}`);
 }
 
+/**
+ * Fees paid, in FRI. Gas prices on a fork come from the real forked block
+ * header, so these track mainnet rather than a devnet fiction.
+ */
+const fees: { label: string; fri: bigint }[] = [];
+
+async function feeOf(provider: RpcProvider, hashValue: string, label: string) {
+  try {
+    const receipt = (await provider.getTransactionReceipt(hashValue)) as {
+      actual_fee?: { amount?: string } | string;
+    };
+    const raw =
+      typeof receipt.actual_fee === "string"
+        ? receipt.actual_fee
+        : receipt.actual_fee?.amount;
+    if (raw) fees.push({ label, fri: BigInt(raw) });
+  } catch {
+    // A missing receipt should never fail the rehearsal.
+  }
+}
+
 function fmt(value: bigint, decimals: number, places = 6): string {
   const base = 10n ** BigInt(decimals);
   const whole = value / base;
@@ -110,12 +131,14 @@ async function main() {
   const declared = await owner.declareIfNot({ contract: sierra, casm });
   if (declared.transaction_hash) {
     await provider.waitForTransaction(declared.transaction_hash);
+    await feeOf(provider, declared.transaction_hash, "declare class");
   }
   const deployment = await owner.deployContract({
     classHash: declared.class_hash,
     constructorCalldata: [pool.address, EKUBO_ROUTER, owner.address],
   });
   await provider.waitForTransaction(deployment.transaction_hash);
+  await feeOf(provider, deployment.transaction_hash, "deploy venue");
   const venue = deployment.contract_address;
   console.log(`  class ${declared.class_hash}`);
   console.log(`  venue ${venue}\n`);
@@ -184,6 +207,7 @@ async function main() {
     ]),
   });
   await provider.waitForTransaction(create.transaction_hash);
+  await feeOf(provider, create.transaction_hash, "create_batch");
   const batchId = 1;
   console.log(`  batch ${batchId}\n`);
 
@@ -222,6 +246,7 @@ async function main() {
       },
     ]);
     await provider.waitForTransaction(tx.transaction_hash);
+    await feeOf(provider, tx.transaction_hash, `join ${order.lots} lots`);
     console.log(`  ${order.lots} lots  ${commitment.slice(0, 14)}…`);
   }
 
@@ -269,6 +294,7 @@ async function main() {
     calldata: CallData.compile([num.toHex(batchId), "0x0", "0x0", "0x0"]),
   });
   const receipt = await provider.waitForTransaction(settle.transaction_hash);
+  await feeOf(provider, settle.transaction_hash, "settle (Ekubo swap)");
   console.log(`  tx ${settle.transaction_hash}`);
   check(
     "settlement succeeded",
@@ -336,6 +362,7 @@ async function main() {
       ]),
     });
     await provider.waitForTransaction(tx.transaction_hash);
+    await feeOf(provider, tx.transaction_hash, `claim ${order.lots} lots`);
 
     // The venue approves the pool for exactly the payout, which is how the real
     // pool collects the tokens backing the note it credits.
@@ -421,6 +448,17 @@ async function main() {
     directCallRejected = true;
   }
   check("direct caller rejected", directCallRejected);
+
+  console.log("\nFees actually paid, at forked mainnet gas prices");
+  let totalFri = 0n;
+  for (const entry of fees) {
+    totalFri += entry.fri;
+    console.log(
+      `  ${entry.label.padEnd(22)} ${fmt(entry.fri, 18, 5).padStart(12)} STRK`,
+    );
+  }
+  console.log(`  ${"-".repeat(22)} ${"-".repeat(12)}`);
+  console.log(`  ${"TOTAL".padEnd(22)} ${fmt(totalFri, 18, 5).padStart(12)} STRK`);
 
   console.log(
     `\n${failures === 0 ? "Rehearsal passed" : `${failures} check(s) FAILED`}`,

@@ -12,7 +12,8 @@
     "rehearse": "tsx scripts/fork-rehearsal.ts",
     "deploy:venue": "tsx scripts/deploy.ts",
     "batch:create": "tsx scripts/create-batch.ts",
-    "batch:settle": "tsx scripts/settle.ts"
+    "batch:settle": "tsx scripts/settle.ts",
+    "check:account": "tsx scripts/check-account.ts"
   },
   "dependencies": {
     "@starknet-io/get-starknet-discovery": "6.0.2",
