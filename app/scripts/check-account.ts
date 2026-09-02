@@ -12,6 +12,8 @@
  *
  * Usage: npx tsx scripts/check-account.ts
  */
+// Must be first: populates process.env before config.ts is evaluated.
+import "./env";
 import { Account, RpcProvider, ec, hash, num } from "starknet";
 import { STRK } from "../src/lib/config";
 import { artifacts, getAccount, getProvider, requireEnv } from "./shared";

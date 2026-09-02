@@ -9,6 +9,8 @@
  *   npm run batch:settle -- --batch 1
  *   npm run batch:settle -- --batch 1 --void
  */
+// Must be first: populates process.env before config.ts is evaluated.
+import "./env";
 import { CallData, num } from "starknet";
 import { VENUE_ADDRESS } from "../src/lib/config";
 import { decodeBatch, phaseOf } from "../src/lib/convoy";
@@ -87,7 +89,7 @@ async function main() {
     },
     "settle",
   );
-  recordTransaction(hash);
+  recordTransaction(hash, false);
 
   const after = await provider.callContract({
     contractAddress: VENUE_ADDRESS,

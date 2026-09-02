@@ -6,6 +6,8 @@
  * whether the deployment is affordable, so this prints the resource amounts and
  * the prices they are multiplied by, at the forked block and at the head.
  */
+// Must be first: populates process.env before config.ts is evaluated.
+import "./env";
 import { RpcProvider, num } from "starknet";
 import { artifacts, getAccount, getProvider } from "./shared";
 

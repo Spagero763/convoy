@@ -79,10 +79,18 @@ export async function submit(
 }
 
 /**
- * Appends a hash to the `transactions` array in strk20.json so the record of
- * mainnet activity is built as it happens rather than reconstructed later.
+ * Appends a hash to the `transactions` array in strk20.json.
+ *
+ * Only calls that actually reach the privacy pool belong here. Scheduling and
+ * settling talk to the venue directly, never through the pool, so recording
+ * them would fill the manifest with hashes that look like activity and count
+ * for nothing.
  */
-export function recordTransaction(hash: string): void {
+export function recordTransaction(hash: string, touchesPool = false): void {
+  if (!touchesPool) {
+    console.log(`  not recorded in strk20.json: this call does not reach the pool`);
+    return;
+  }
   const path = resolve(process.cwd(), "../strk20.json");
   try {
     const manifest = JSON.parse(readFileSync(path, "utf8"));

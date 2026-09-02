@@ -70,6 +70,15 @@ const WalletContext = createContext<WalletContextValue | null>(null);
 
 const LAST_WALLET_KEY = "convoy.wallet";
 
+function sameChain(a: string | null | undefined, b: string): boolean {
+  if (!a) return false;
+  try {
+    return BigInt(a) === BigInt(b);
+  } catch {
+    return a.trim().toLowerCase() === b.trim().toLowerCase();
+  }
+}
+
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<WalletStatus>("loading");
   const [address, setAddress] = useState<string | null>(null);
@@ -195,8 +204,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         // Ask the wallet what chain it is on before building an account against
         // it, so a wrong-network wallet produces a clear answer rather than a
         // pile of failing reads.
+        // Compared numerically, never as strings. Wallets return this in
+        // different hex forms (padded, unpadded, mixed case) and a strict
+        // string compare reports a mainnet wallet as being on the wrong chain.
         const chainId = await walletV6.requestChainId(target);
-        if (chainId !== CHAIN_ID) {
+        if (!sameChain(chainId, CHAIN_ID)) {
           setWalletName(target.name);
           setStatus("wrong-network");
           return;

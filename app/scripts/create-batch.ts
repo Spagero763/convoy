@@ -11,6 +11,8 @@
  *   --floor        minimum USDC output per lot, the slippage guard
  *   --opens-in     minutes until it opens (default 0)
  */
+// Must be first: populates process.env before config.ts is evaluated.
+import "./env";
 import { CallData, num } from "starknet";
 import { DEFAULT_ROUTE, STRK, USDC, VENUE_ADDRESS } from "../src/lib/config";
 import { getAccount, getProvider, recordTransaction, submit } from "./shared";
@@ -85,7 +87,7 @@ async function main() {
     { contractAddress: VENUE_ADDRESS, entrypoint: "create_batch", calldata },
     "create_batch",
   );
-  recordTransaction(hash);
+  recordTransaction(hash, false);
 
   const next = await provider.callContract({
     contractAddress: VENUE_ADDRESS,

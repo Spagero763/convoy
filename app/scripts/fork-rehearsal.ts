@@ -16,6 +16,8 @@
  *
  * Usage: npx tsx scripts/fork-rehearsal.ts
  */
+// Must be first: populates process.env before config.ts is evaluated.
+import "./env";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { Account, CallData, RpcProvider, hash, num } from "starknet";

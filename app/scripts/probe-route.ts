@@ -4,6 +4,8 @@
  *
  * Usage: npm run probe:route
  */
+// Must be first: populates process.env before config.ts is evaluated.
+import "./env";
 import { RpcProvider, hash, num } from "starknet";
 import { EKUBO_CORE, RPC_URLS, STRK, USDC } from "../src/lib/config";
 

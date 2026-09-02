@@ -6,6 +6,8 @@
  *
  * Usage: npm run deploy:venue
  */
+// Must be first: populates process.env before config.ts is evaluated.
+import "./env";
 import { hash } from "starknet";
 import { EKUBO_ROUTER, POOL_ADDRESS } from "../src/lib/config";
 import { artifacts, getAccount, getProvider, requireEnv, submit } from "./shared";
