@@ -224,6 +224,27 @@ ok  direct caller rejected
 The one-unit gap is the rounding invariant: redemptions round down, so the
 remainder stays as dust rather than leaving the last order unpayable.
 
+The rehearsal also reports what each step costs, at the forked block's real gas
+prices:
+
+```
+  declare class               0.79367 STRK
+  deploy venue                0.00321 STRK
+  create_batch                0.00838 STRK
+  join                        0.00502 STRK
+  settle (Ekubo swap)         0.01248 STRK
+  claim                       0.00334 STRK
+  ---------------------- ------------
+  TOTAL (3 joins, 3 claims)   0.84486 STRK
+```
+
+Declaring the class is 94% of it. Everything after deployment is close to free.
+
+Two caveats worth stating: gas prices move, and joins and claims cost more on
+mainnet than they do here, because there they are private transactions routed
+through the pool's prover and paymaster rather than direct calls. Budget a few
+STRK for those rather than the figure above.
+
 ### Deploying
 
 ```bash
