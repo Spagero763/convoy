@@ -133,6 +133,16 @@ export function explain(error: unknown): Explained {
     }
   }
 
+  if (lower.includes("not preauthorized") || lower.includes("not pre-authorized")) {
+    return {
+      title: "Your wallet has not authorised this site yet.",
+      action:
+        "Open the wallet extension and approve the connection request, then try again. If no request appeared, unlock the wallet first.",
+      raw,
+      kind: "wallet",
+    };
+  }
+
   if (lower.includes("invalid_request_payload")) {
     return {
       title: "Your wallet refused the shape of this request.",

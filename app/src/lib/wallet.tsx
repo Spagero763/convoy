@@ -201,9 +201,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
         const { WalletAccountV6, walletV6 } = await import("starknet");
 
-        // Ask the wallet what chain it is on before building an account against
-        // it, so a wrong-network wallet produces a clear answer rather than a
-        // pile of failing reads.
+        // Authorisation has to come first. A wallet rejects reads from a dapp
+        // it has not been connected to yet, with "Not preauthorized", so asking
+        // for the chain id before prompting fails on a perfectly good wallet.
+        const account = await WalletAccountV6.connect(
+          { nodeUrl: RPC_URLS[0] },
+          target,
+        );
+
         // Compared numerically, never as strings. Wallets return this in
         // different hex forms (padded, unpadded, mixed case) and a strict
         // string compare reports a mainnet wallet as being on the wrong chain.
@@ -213,11 +218,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           setStatus("wrong-network");
           return;
         }
-
-        const account = await WalletAccountV6.connect(
-          { nodeUrl: RPC_URLS[0] },
-          target,
-        );
 
         const hasPrivacy = await probePrivacy(account);
         accountRef.current = account;

@@ -54,6 +54,14 @@ export default function DiagnosticsPage() {
         let privacy: Row["privacy"] = "error";
         let detail = "";
 
+        // Authorise first, or every read below fails with "Not preauthorized"
+        // and the report blames the wallet for a permissions problem.
+        try {
+          await walletV6.requestAccounts(wallet, false);
+        } catch (error) {
+          detail = `authorisation refused: ${String(error).slice(0, 120)}`;
+        }
+
         try {
           chainId = await walletV6.requestChainId(wallet);
           onMainnet = BigInt(chainId) === BigInt(CHAIN_ID);
