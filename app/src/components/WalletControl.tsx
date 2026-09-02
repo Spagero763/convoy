@@ -20,6 +20,8 @@ export function WalletControl() {
     rescan,
     disconnect,
     switchNetwork,
+    error,
+    clearError,
   } = useWallet();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -81,6 +83,25 @@ export function WalletControl() {
 
       {open && (
         <div className={styles.menu} role="menu">
+          {/* A connection that failed must say so. Silently returning to
+              "Connect" is indistinguishable from the button not working. */}
+          {error && (
+            <div className={styles.problem}>
+              <strong style={{ color: "var(--ink)" }}>{error.title}</strong>
+              {error.action && <p style={{ margin: "5px 0 0" }}>{error.action}</p>}
+              <details style={{ marginTop: 7 }}>
+                <summary className={styles.problemSummary}>Technical detail</summary>
+                <code className={styles.problemRaw}>{error.raw}</code>
+              </details>
+              <button
+                className="btn btn-ghost btn-block"
+                style={{ marginTop: 8 }}
+                onClick={clearError}
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
           {status === "ready" && address ? (
             <>
               <div className={styles.menuHead}>

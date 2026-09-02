@@ -89,3 +89,36 @@
 .link:hover {
   text-decoration: underline;
 }
+
+.problem {
+  padding: 11px 10px;
+  margin-bottom: 6px;
+  border: 1px solid rgba(229, 105, 95, 0.35);
+  border-radius: var(--radius);
+  background: rgba(229, 105, 95, 0.06);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+.problemSummary {
+  cursor: pointer;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+
+.problemRaw {
+  display: block;
+  margin-top: 6px;
+  padding: 8px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.45);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 150px;
+  overflow: auto;
+}
