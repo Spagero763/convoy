@@ -144,17 +144,9 @@ export function WalletControl() {
                 cannot read a shielded balance or place an order.
               </p>
               <p style={{ margin: "8px 0 0" }}>
-                Register and shield at{" "}
-                <a
-                  className={styles.link}
-                  href="https://strk20.starknet.io/app"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  strk20.starknet.io/app
-                </a>
-                , or turn on privacy inside {walletName}. Then come back and
-                reconnect.
+                Only a wallet can register a key, and it does so the first time
+                you shield. Open {walletName}, pick a token, and use its own
+                shield action once. Then come back.
               </p>
               <button
                 className="btn btn-ghost btn-block"

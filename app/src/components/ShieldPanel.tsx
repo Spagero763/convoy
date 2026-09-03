@@ -15,8 +15,10 @@ import styles from "./ShieldPanel.module.css";
  *
  * This is the one operation that is deliberately not private, and the panel
  * says so rather than letting the word "shield" imply more than it does. It is
- * also the step that enrols an account: the wallet registers a viewing key on
- * first use, so a first shield doubles as onboarding.
+ * Enrolment is not something an app can do. The wallet API exposes only
+ * balances, invoke and prepare, and a viewing key is registered by the wallet
+ * the first time it shields. So this panel tops up an enrolled account, and
+ * says plainly that the first shield has to happen inside the wallet.
  */
 export function ShieldPanel({ onShielded }: { onShielded?: () => void }) {
   const { status, address, submitPrivate, refreshBalances, connect, walletName } =
@@ -89,12 +91,19 @@ export function ShieldPanel({ onShielded }: { onShielded?: () => void }) {
 
       <div className={styles.body}>
         {notEnrolled && (
-          <div className="notice notice-info" style={{ marginBottom: 16 }}>
-            <p className="notice-title">This account has not used the pool yet.</p>
+          <div className="notice notice-warn" style={{ marginBottom: 16 }}>
+            <p className="notice-title">
+              Shield once inside your wallet first.
+            </p>
             <p className="notice-body">
-              Your wallet registers a viewing key on its first privacy
-              operation, so shielding enrols you and funds you in one step.
-              There is nothing to do beforehand.
+              A viewing key is registered the first time you shield, and only
+              the wallet can do that. There is no method in the wallet API for
+              an app to register on your behalf, so this panel cannot enrol you.
+              <br />
+              <br />
+              Open your wallet, select {STRK.symbol}, and use its own shield
+              action. It takes one transaction. After that this panel works for
+              topping up, and Convoy can read your shielded balance.
             </p>
           </div>
         )}
@@ -181,13 +190,15 @@ export function ShieldPanel({ onShielded }: { onShielded?: () => void }) {
           className="btn btn-primary btn-block btn-lg"
           style={{ marginTop: 16 }}
           onClick={() => void shield()}
-          disabled={busy || parsed === null || parsed === 0n || short}
+          disabled={busy || parsed === null || parsed === 0n || short || notEnrolled}
         >
-          {busy
-            ? "Working"
-            : parsed === null
-              ? "Enter an amount"
-              : `Shield ${formatUnits(parsed, STRK.decimals, 4)} ${STRK.symbol}`}
+          {notEnrolled
+            ? "Shield in your wallet first"
+            : busy
+              ? "Working"
+              : parsed === null
+                ? "Enter an amount"
+                : `Shield ${formatUnits(parsed, STRK.decimals, 4)} ${STRK.symbol}`}
         </button>
 
         <TxStatus state={state} onDismiss={reset} />
