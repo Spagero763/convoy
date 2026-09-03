@@ -1,0 +1,91 @@
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.head {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.body {
+  padding: 18px;
+}
+
+.field {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 0 12px;
+  height: 46px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+  transition: border-color 120ms ease;
+}
+
+.inputRow:focus-within {
+  border-color: var(--signal);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: none;
+  outline: none;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.suffix {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  flex: none;
+}
+
+.costs {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+  padding: 4px 13px;
+}
+
+.costRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.costRow:last-child {
+  border-bottom: 0;
+}
+
+.costKey {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.costValue {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--ink);
+  white-space: nowrap;
+}

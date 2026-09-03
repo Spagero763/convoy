@@ -5,14 +5,17 @@ import Link from "next/link";
 import { JoinPanel } from "../components/JoinPanel";
 import { LiveBatch } from "../components/LiveBatch";
 import { NotConfigured } from "../components/NotConfigured";
+import { ShieldPanel } from "../components/ShieldPanel";
 import { phaseOf, tokenMeta, type Batch } from "../lib/convoy";
 import { clearingRate, formatUnits } from "../lib/format";
 import { listOrders } from "../lib/orders";
 import { useBoard } from "../lib/useBoard";
+import { useWallet } from "../lib/wallet";
 import styles from "./page.module.css";
 
 export default function BoardPage() {
   const { batches, legs, configured, error, now, refresh } = useBoard();
+  const { status } = useWallet();
   const [mine, setMine] = useState<string[]>([]);
 
   useEffect(() => {
@@ -84,15 +87,23 @@ export default function BoardPage() {
               </div>
 
               <div className={styles.column}>
-                {batches === null ? (
+                {/* Enrolment comes before anything else can work, so the shield
+                    panel takes the slot rather than sitting below a join form
+                    that cannot be used yet. */}
+                {status === "not-registered" ? (
+                  <ShieldPanel onShielded={refresh} />
+                ) : batches === null ? (
                   <span className={`skeleton ${styles.skeletonSide}`} />
                 ) : active ? (
-                  <JoinPanel
-                    batch={active}
-                    legs={legs[active.id] ?? []}
-                    now={now}
-                    onJoined={refresh}
-                  />
+                  <>
+                    <JoinPanel
+                      batch={active}
+                      legs={legs[active.id] ?? []}
+                      now={now}
+                      onJoined={refresh}
+                    />
+                    {status === "ready" && <ShieldPanel />}
+                  </>
                 ) : null}
               </div>
             </div>
