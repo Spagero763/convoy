@@ -47,6 +47,11 @@ export const STRK: TokenInfo = {
   display: 4,
 };
 
+/**
+ * The contract self-reports `USDC` / `USD Coin`. This is the bridged token, and
+ * some wallets label it `USDC.e` to distinguish it from native USDC. The symbol
+ * here follows the contract rather than any wallet's annotation.
+ */
 export const USDC: TokenInfo = {
   address: "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
   symbol: "USDC",
