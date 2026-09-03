@@ -133,6 +133,16 @@ export function explain(error: unknown): Explained {
     }
   }
 
+  if (lower.includes("not_registered") || lower.includes("not registered")) {
+    return {
+      title: "This account has not enrolled with the privacy pool yet.",
+      action:
+        "Registering a viewing key is a one-time, on-chain step that every pool user does once. Until it happens, nothing can be sent to you privately.",
+      raw,
+      kind: "wallet",
+    };
+  }
+
   if (lower.includes("not preauthorized") || lower.includes("not pre-authorized")) {
     return {
       title: "Your wallet has not authorised this site yet.",

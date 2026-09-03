@@ -33,6 +33,7 @@ export type WalletStatus =
   | "connecting"
   | "wrong-network"
   | "no-privacy"
+  | "not-registered"
   | "ready";
 
 export type WalletChoice = {
@@ -147,18 +148,27 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  /**
+   * Distinguishes three outcomes that look alike but need different answers.
+   *
+   * A wallet with no STRK20 methods needs a different wallet. An account that
+   * has never registered a viewing key with the pool needs to enrol, which is a
+   * one-time step and not a fault. Only anything else is a real error.
+   */
   const probePrivacy = useCallback(
-    async (account: WalletAccountV6): Promise<boolean> => {
+    async (
+      account: WalletAccountV6,
+    ): Promise<"ready" | "no-privacy" | "not-registered"> => {
       try {
         await account.strk20Balances([STRK.address as `0x${string}`]);
-        return true;
+        return "ready";
       } catch (err) {
         const text = String(err).toLowerCase();
-        // A wallet that answers "not implemented" has told us to show a
-        // different path. Any other failure is a real error, not a capability
-        // signal, so we do not brand the wallet unsupported for it.
+        if (text.includes("not_registered") || text.includes("not registered")) {
+          return "not-registered";
+        }
         if (text.includes("not implemented") || text.includes("not supported")) {
-          return false;
+          return "no-privacy";
         }
         throw err;
       }
@@ -181,7 +191,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         })),
       );
     } catch (err) {
-      setError(explain(err));
+      if (String(err).toLowerCase().includes("not_registered")) {
+        setStatus("not-registered");
+      } else {
+        setError(explain(err));
+      }
     } finally {
       setBalancesLoading(false);
     }
@@ -219,14 +233,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        const hasPrivacy = await probePrivacy(account);
+        const privacy = await probePrivacy(account);
         accountRef.current = account;
         setAddress(account.address);
         setWalletName(target.name);
         window.localStorage.setItem(LAST_WALLET_KEY, target.name);
 
-        if (!hasPrivacy) {
-          setStatus("no-privacy");
+        if (privacy !== "ready") {
+          setStatus(privacy);
           return;
         }
 

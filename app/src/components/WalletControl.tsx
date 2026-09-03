@@ -68,7 +68,9 @@ export function WalletControl() {
     <div className={styles.wrap} ref={wrapRef}>
       <button
         className={`${styles.trigger} ${
-          status === "no-privacy" ? styles.triggerAlert : ""
+          status === "no-privacy" || status === "not-registered"
+            ? styles.triggerAlert
+            : ""
         }`}
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -78,7 +80,9 @@ export function WalletControl() {
           ? truncateHex(address, 4, 4)
           : status === "no-privacy"
             ? "No privacy support"
-            : "Connect"}
+            : status === "not-registered"
+              ? "Not enrolled"
+              : "Connect"}
       </button>
 
       {open && (
@@ -129,6 +133,40 @@ export function WalletControl() {
                 Disconnect
               </button>
             </>
+          ) : status === "not-registered" ? (
+            <div className={styles.empty}>
+              <strong style={{ color: "var(--ink)" }}>
+                Not enrolled with the privacy pool.
+              </strong>
+              <p style={{ margin: "6px 0 0" }}>
+                Every pool user registers a viewing key once, on chain. Without
+                it nothing can be sent to this account privately, so Convoy
+                cannot read a shielded balance or place an order.
+              </p>
+              <p style={{ margin: "8px 0 0" }}>
+                Register and shield at{" "}
+                <a
+                  className={styles.link}
+                  href="https://strk20.starknet.io/app"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  strk20.starknet.io/app
+                </a>
+                , or turn on privacy inside {walletName}. Then come back and
+                reconnect.
+              </p>
+              <button
+                className="btn btn-ghost btn-block"
+                style={{ marginTop: 10 }}
+                onClick={() => {
+                  if (walletName) void connect(walletName);
+                  setOpen(false);
+                }}
+              >
+                I have registered, check again
+              </button>
+            </div>
           ) : status === "no-privacy" ? (
             <div className={styles.empty}>
               <strong style={{ color: "var(--ink)" }}>
