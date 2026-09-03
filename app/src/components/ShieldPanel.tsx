@@ -14,7 +14,8 @@ import styles from "./ShieldPanel.module.css";
  * Moving public STRK into the pool.
  *
  * This is the one operation that is deliberately not private, and the panel
- * says so rather than letting the word "shield" imply more than it does. It is
+ * says so rather than letting the word "shield" imply more than it does.
+ *
  * Enrolment is not something an app can do. The wallet API exposes only
  * balances, invoke and prepare, and a viewing key is registered by the wallet
  * the first time it shields. So this panel tops up an enrolled account, and
