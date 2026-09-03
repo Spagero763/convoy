@@ -2,7 +2,13 @@
 
 import { useMemo, useRef, useState } from "react";
 import { buildJoinActions, lotValue } from "../lib/actions";
-import { orderCommitment, phaseOf, tokenMeta, type Batch } from "../lib/convoy";
+import {
+  orderCommitment,
+  phaseOf,
+  readOrder,
+  tokenMeta,
+  type Batch,
+} from "../lib/convoy";
 import { STRK } from "../lib/config";
 import { explain, type Explained } from "../lib/errors";
 import { formatUnits } from "../lib/format";
@@ -64,19 +70,42 @@ export function JoinPanel({ batch, legs, now, onJoined }: Props) {
   const shortfall = shielded !== null && shielded < cost;
   const canJoin = status === "ready" && phase === "filling" && !busy && !shortfall;
 
-  /** Derives the order key for a slot. Raises exactly one signature prompt. */
-  async function deriveOrder(slot: number) {
-    const signature = await signTypedData(orderKeyTypedData(batch.id, slot));
-    const secret = foldSignature(signature);
-    const commitment = orderCommitment(batch.id, secret);
-    const actions = buildJoinActions({
-      batchId: batch.id,
-      lots,
-      tokenIn: batch.tokenIn,
-      lotSize: batch.lotSize,
-      commitment,
-    });
-    return { secret, commitment, actions };
+  /**
+   * Derives an order key, checking each candidate against the chain before it
+   * is used.
+   *
+   * The slot counter is local, and local state is not authoritative: it lives
+   * per origin, so an order placed on a different port or browser is invisible
+   * to it, and a stale counter re-derives a commitment the contract already
+   * holds. That fails as CONVOY_CMT_EXISTS after the user has approved a
+   * prompt. The chain is the only reliable answer, so unused slots are found by
+   * asking it.
+   */
+  async function deriveOrder(startSlot: number) {
+    for (let slot = startSlot; slot < startSlot + 8; slot += 1) {
+      const signature = await signTypedData(orderKeyTypedData(batch.id, slot));
+      const secret = foldSignature(signature);
+      const commitment = orderCommitment(batch.id, secret);
+
+      const existing = await readOrder(commitment).catch(() => null);
+      if (existing && existing.lots !== 0) continue;
+
+      return {
+        slot,
+        secret,
+        commitment,
+        actions: buildJoinActions({
+          batchId: batch.id,
+          lots,
+          tokenIn: batch.tokenIn,
+          lotSize: batch.lotSize,
+          commitment,
+        }),
+      };
+    }
+    throw new Error(
+      "Could not find an unused order key for this batch after several tries.",
+    );
   }
 
   /**
@@ -112,11 +141,12 @@ export function JoinPanel({ batch, legs, now, onJoined }: Props) {
 
     await run({
       submit: async () => {
-        const { secret, commitment, actions } = await deriveOrder(slot);
+        const { slot: usedSlot, secret, commitment, actions } =
+          await deriveOrder(slot);
         const hash = await submitPrivate(actions);
         saveOrder({
           batchId: batch.id,
-          slot,
+          slot: usedSlot,
           commitment,
           lots,
           createdAt: Date.now(),

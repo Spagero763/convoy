@@ -14,7 +14,8 @@
     "batch:create": "tsx scripts/create-batch.ts",
     "batch:settle": "tsx scripts/settle.ts",
     "check:account": "tsx scripts/check-account.ts",
-    "check:enrolment": "tsx scripts/check-enrolment.ts"
+    "check:enrolment": "tsx scripts/check-enrolment.ts",
+    "manifest:sync": "tsx scripts/sync-manifest.ts"
   },
   "dependencies": {
     "@starknet-io/get-starknet-discovery": "6.0.2",
