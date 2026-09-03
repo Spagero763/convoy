@@ -133,6 +133,15 @@ export async function readQuote(batchId: number, lots: number): Promise<bigint> 
   return BigInt(raw[0]);
 }
 
+/**
+ * Block the venue was deployed in. Events cannot predate it, so scans start
+ * here rather than at genesis.
+ */
+const VENUE_FROM_BLOCK = Number(process.env.NEXT_PUBLIC_VENUE_FROM_BLOCK ?? 14286000);
+
+/** Fallback window when the deployment block is not configured. */
+const LEG_SCAN_SPAN = 50_000;
+
 export type JoinedLeg = {
   commitment: string;
   lots: number;
@@ -150,12 +159,18 @@ export async function readBatchLegs(batchId: number): Promise<JoinedLeg[]> {
   const legs: JoinedLeg[] = [];
   let continuationToken: string | undefined;
 
+  // Scanning from genesis returns nothing rather than erroring: providers cap
+  // the range and answer an unbounded query with an empty page. A bounded
+  // window anchored near deployment is what actually returns events.
+  const head = await provider.blockNumber();
+  const fromBlock = Math.max(0, Math.min(VENUE_FROM_BLOCK, head - LEG_SCAN_SPAN));
+
   for (let page = 0; page < 10; page += 1) {
     const chunk = await provider.run((p) =>
       p.getEvents({
         address: VENUE_ADDRESS,
         keys: [[selector], [num.toHex(batchId)]],
-        from_block: { block_number: 0 },
+        from_block: { block_number: fromBlock },
         to_block: "latest",
         chunk_size: 500,
         continuation_token: continuationToken,
