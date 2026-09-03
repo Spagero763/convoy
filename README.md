@@ -7,6 +7,38 @@ both handles by never letting anyone execute alone.
 
 ---
 
+## Live on mainnet
+
+Deployed and exercised end to end on Starknet mainnet, not a testnet and not a
+fork.
+
+| | |
+|---|---|
+| Venue | [`0x489be265…c524f56`](https://voyager.online/contract/0x489be26596b25a288f35708f776b1dacd1dde52be25b9c178a6277f8c524f56) |
+| Demo | [convoy-brown.vercel.app](https://convoy-brown.vercel.app) |
+| Route | STRK to USDC, Ekubo 0.05% |
+
+Batch 002, the first real crossing:
+
+```
+join    1 lot    private, through the pool     0x5f85f3e7…602e6f3
+join    1 lot    private, through the pool     0x71060e06…c9a2623e
+settle  4.0000 STRK  ->  0.111307 USDC         0x3a34ac77…8e7f7267
+claim   0.055653 USDC into a shielded note     0x1b15747f…9fbff7e8
+```
+
+Two orders placed separately, minutes apart, by a participant the chain never
+identifies. They left as **one** public transaction at **one** clearing rate.
+The redemption arrived as a private note carrying no link to the join that
+funded it.
+
+The settlement transaction is the point. An observer reading it sees 4 STRK
+crossing to USDC. They cannot see that it was two orders, how those orders were
+divided, or who placed either one.
+
+Batch 001 is on chain too, voided rather than settled: it drew no orders, and a
+batch that cannot hide anyone refuses to execute.
+
 ## The problem
 
 STRK20 gives Starknet real sender privacy. A note-to-note transfer emits an
