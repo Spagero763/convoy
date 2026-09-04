@@ -18,26 +18,29 @@ fork.
 | Demo | [convoy-brown.vercel.app](https://convoy-brown.vercel.app) |
 | Route | STRK to USDC, Ekubo 0.05% |
 
-Batch 002, the first real crossing:
+Three batches crossed, two refused:
 
-```
-join    1 lot    private, through the pool     0x5f85f3e7…602e6f3
-join    1 lot    private, through the pool     0x71060e06…c9a2623e
-settle  4.0000 STRK  ->  0.111307 USDC         0x3a34ac77…8e7f7267
-claim   0.055653 USDC into a shielded note     0x1b15747f…9fbff7e8
-```
+| Batch | Outcome | |
+|---|---|---|
+| 005 | settled | 6.0000 STRK to 0.156563 USDC, 2 orders of unequal size |
+| 004 | settled | 4.0000 STRK to 0.108366 USDC, 2 orders |
+| 003 | voided | drew no orders, refused to execute |
+| 002 | settled | 4.0000 STRK to 0.111307 USDC, 2 orders |
+| 001 | voided | drew no orders, refused to execute |
 
-Two orders placed separately, minutes apart, by a participant the chain never
-identifies. They left as **one** public transaction at **one** clearing rate.
-The redemption arrived as a private note carrying no link to the join that
-funded it.
+Nine transactions qualify: joins and redemptions, each verified to have
+succeeded, touched the pool, and run through the venue.
 
-The settlement transaction is the point. An observer reading it sees 4 STRK
-crossing to USDC. They cannot see that it was two orders, how those orders were
-divided, or who placed either one.
+Batch 005 is the clearest demonstration. It held a two-lot order and a one-lot
+order, placed separately by a participant the chain never identifies. They left
+as **one** transaction at **one** rate. An observer reading that transaction
+sees six STRK crossing to USDC, and cannot recover that it was two orders, that
+one was twice the other, or who placed either.
 
-Batch 001 is on chain too, voided rather than settled: it drew no orders, and a
-batch that cannot hide anyone refuses to execute.
+The voided batches matter as much. A batch below its minimum order count
+refuses to settle and refunds instead: the venue would rather return your funds
+than execute them in a crowd too small to hide them. That rule is in the
+contract, not the marketing.
 
 ## The problem
 
