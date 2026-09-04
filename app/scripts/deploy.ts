@@ -10,10 +10,10 @@
 import "./env";
 import { hash } from "starknet";
 import { EKUBO_ROUTER, POOL_ADDRESS } from "../src/lib/config";
-import { artifacts, getAccount, getProvider, requireEnv, submit } from "./shared";
+import { artifacts, getAccount, requireEnv, resolveProvider, submit } from "./shared";
 
 async function main() {
-  const provider = getProvider();
+  const provider = await resolveProvider();
   const account = getAccount(provider);
   const { sierra, casm } = artifacts();
 

@@ -19,7 +19,7 @@ import "./env";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { POOL_ADDRESS, VENUE_ADDRESS } from "../src/lib/config";
-import { getProvider } from "./shared";
+import { resolveProvider, getProvider } from "./shared";
 
 /** Comfortably before the venue was deployed. */
 const FROM_BLOCK = Number(process.env.SCAN_FROM_BLOCK ?? 14_250_000);
@@ -27,7 +27,7 @@ const FROM_BLOCK = Number(process.env.SCAN_FROM_BLOCK ?? 14_250_000);
 const MANIFEST = resolve(process.cwd(), "../strk20.json");
 
 async function main() {
-  const provider = getProvider();
+  const provider = await resolveProvider();
   const head = (await provider.getBlockLatestAccepted()).block_number;
   console.log(`scanning ${FROM_BLOCK} to ${head} for events from the venue\n`);
 

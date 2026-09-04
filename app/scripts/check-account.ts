@@ -16,7 +16,7 @@
 import "./env";
 import { Account, RpcProvider, ec, hash, num } from "starknet";
 import { STRK } from "../src/lib/config";
-import { artifacts, getAccount, getProvider, requireEnv } from "./shared";
+import { artifacts, getAccount, requireEnv, resolveProvider } from "./shared";
 
 function fmt(value: bigint, decimals = 18, places = 5): string {
   const base = 10n ** BigInt(decimals);
@@ -25,7 +25,7 @@ function fmt(value: bigint, decimals = 18, places = 5): string {
 }
 
 async function main() {
-  const provider = getProvider();
+  const provider = await resolveProvider();
   const address = requireEnv("DEPLOYER_ADDRESS");
   const privateKey = requireEnv("DEPLOYER_PRIVATE_KEY");
 

@@ -14,7 +14,7 @@ import "./env";
 import { CallData, num } from "starknet";
 import { VENUE_ADDRESS } from "../src/lib/config";
 import { decodeBatch, phaseOf } from "../src/lib/convoy";
-import { getAccount, getProvider, recordTransaction, submit } from "./shared";
+import { getAccount, recordTransaction, resolveProvider, submit } from "./shared";
 
 function arg(name: string, fallback?: string): string {
   const index = process.argv.indexOf(`--${name}`);
@@ -28,7 +28,7 @@ function arg(name: string, fallback?: string): string {
 async function main() {
   if (!VENUE_ADDRESS) throw new Error("Set NEXT_PUBLIC_VENUE_ADDRESS first");
 
-  const provider = getProvider();
+  const provider = await resolveProvider();
   const account = getAccount(provider);
   const batchId = Number(arg("batch"));
   const voiding = process.argv.includes("--void");

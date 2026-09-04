@@ -42,8 +42,39 @@ export function requireEnv(name: string): string {
   return value;
 }
 
+let cachedProvider: RpcProvider | null = null;
+
+/**
+ * Picks an endpoint that is actually answering.
+ *
+ * The app rotates providers on failure; these scripts used to pin one, so a
+ * single endpoint having a bad minute aborted a deployment step with a bare
+ * "fetch failed". Resolution happens once per process and is then reused.
+ */
+export async function resolveProvider(): Promise<RpcProvider> {
+  if (cachedProvider) return cachedProvider;
+
+  const candidates = [process.env.RPC_URL, ...RPC_URLS].filter(Boolean) as string[];
+  const tried: string[] = [];
+
+  for (const nodeUrl of candidates) {
+    if (tried.includes(nodeUrl)) continue;
+    tried.push(nodeUrl);
+    try {
+      const provider = new RpcProvider({ nodeUrl });
+      await provider.getChainId();
+      if (nodeUrl !== candidates[0]) console.log(`  rpc: using ${nodeUrl}`);
+      cachedProvider = provider;
+      return provider;
+    } catch {
+      console.log(`  rpc: ${nodeUrl} not answering, trying the next`);
+    }
+  }
+  throw new Error(`No RPC endpoint answered. Tried: ${tried.join(", ")}`);
+}
+
 export function getProvider(): RpcProvider {
-  return new RpcProvider({ nodeUrl: process.env.RPC_URL ?? RPC_URLS[1] });
+  return cachedProvider ?? new RpcProvider({ nodeUrl: process.env.RPC_URL ?? RPC_URLS[1] });
 }
 
 export function getAccount(provider: RpcProvider): Account {
