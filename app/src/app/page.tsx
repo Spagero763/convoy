@@ -25,8 +25,13 @@ export default function BoardPage() {
   // The batch a person can act on: the one taking orders, else the newest.
   const active = useMemo(() => {
     if (!batches || batches.length === 0) return null;
+    // When several batches are filling, the useful one is whichever seals
+    // first: it is the one a joiner has least time to act on. `batches` is
+    // newest-first, so picking by index would surface the wrong one.
     const open = batches.filter((b) => phaseOf(b, now) === "filling");
-    if (open.length > 0) return open[open.length - 1];
+    if (open.length > 0) {
+      return open.reduce((soonest, b) => (b.sealsAt < soonest.sealsAt ? b : soonest));
+    }
     const sealed = batches.find((b) => phaseOf(b, now) === "sealed");
     return sealed ?? batches[0];
   }, [batches, now]);
